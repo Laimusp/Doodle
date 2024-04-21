@@ -59,7 +59,7 @@ func main() {
 
 	// Настройка маршрутов
 	http.HandleFunc("/register", registerHandler(db)) // Передаем объект db в обработчик
-
+	http.HandleFunc("/login", loginHandler(db))
 	// Запуск веб-сервера
 	fmt.Println("Сервер запущен на порту 8080")
 	err = http.ListenAndServe(":8080", nil)
@@ -103,6 +103,47 @@ func registerHandler(db *sql.DB) http.HandlerFunc { // Принимаем db к�
 			}
 
 			fmt.Fprintf(w, "Регистрация прошла успешно для пользователя %s", nickname)
+		}
+	}
+}
+
+func loginHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			http.ServeFile(w, r, "login.html")
+		} else if r.Method == "POST" {
+			type Data struct {
+				Email         string
+				Password      string
+				Success       bool
+				AccessMessage string
+			}
+
+			user := Data{
+				Email:    r.FormValue("email"),
+				Password: r.FormValue("password"),
+			}
+			var hash string
+			err := db.QueryRow("SELECT password_hash FROM users WHERE email = $1", user.Email).Scan(&hash)
+
+			if err != nil {
+				fmt.Fprintf(w, "USER DATA ERROR")
+				user.AccessMessage = "Такого пользователя не существует"
+				panic(err)
+			}
+
+			user_verify, err := password.Verify(hash, user.Password)
+			if err != nil {
+				panic(err)
+			}
+
+			if user_verify {
+				user.Success = true
+				user.AccessMessage = "Авторизация прошла успешно"
+				fmt.Fprintf(w, "Авторизация прошла успешно")
+			} else {
+				fmt.Fprintf(w, "Неправильный логин или пароль")
+			}
 		}
 	}
 }
