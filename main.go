@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	_ "github.com/lib/pq" // Драйвер PostgreSQL
+	password "github.com/vzglad-smerti/password_hash"
 )
 
 func main() {
@@ -75,7 +76,7 @@ func registerHandler(db *sql.DB) http.HandlerFunc { // Принимаем db к�
 		} else if r.Method == "POST" {
 			nickname := r.FormValue("nickname")
 			email := r.FormValue("email")
-			password := r.FormValue("password")
+			user_password := r.FormValue("password")
 
 			// Проверка, существует ли пользователь
 			var exists bool
@@ -89,8 +90,14 @@ func registerHandler(db *sql.DB) http.HandlerFunc { // Принимаем db к�
 				return
 			}
 
+			// Создание хэша пароля
+			hash, err := password.Hash(user_password)
+			if err != nil {
+				panic(err)
+			}
+
 			// Вставка нового пользователя (обратите внимание на безопасность паролей!)
-			_, err = db.Exec("INSERT INTO users (nickname, email, password_hash) VALUES ($1, $2, $3)", nickname, email, password)
+			_, err = db.Exec("INSERT INTO users (nickname, email, password_hash) VALUES ($1, $2, $3)", nickname, email, hash)
 			if err != nil {
 				panic(err)
 			}

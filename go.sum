@@ -1,2 +1,4 @@
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
+github.com/vzglad-smerti/password_hash v0.0.0-20151126002249-16da77469e78 h1:nrQTZkyQDJ5gavDeMHv9gM1ugeabxy4naagtGjYqHpk=
+github.com/vzglad-smerti/password_hash v0.0.0-20151126002249-16da77469e78/go.mod h1:i0OqeAnmWYnH+oVSbNYRdqP/THnBraXcIDoTdum0ekg=
